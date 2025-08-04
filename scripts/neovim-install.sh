@@ -58,6 +58,7 @@ require("lazy").setup({
   },
   -- Color schemes
   "catppuccin/nvim",
+  "numToStr/Comment.nvim", -- For commenting (Ctrl+/)
   "folke/tokyonight.nvim",
   "EdenEast/nightfox.nvim",
   "Mofiqul/vscode.nvim",
@@ -84,6 +85,8 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
 -- === Make Backspace work as expected ===
 vim.o.backspace = "indent,eol,start"
+-- Keep indentation on new lines and when pasting
+vim.o.autoindent = true
 
 -- ========== KEYBINDINGS WITH EXPLANATIONS ==========
 
@@ -106,6 +109,16 @@ vim.keymap.set("n", "<Esc><Esc>", ":confirm q<CR>")
 -- F10 (any mode) — prompt to save before exiting
 vim.keymap.set("i", "<F10>", "<Esc>:confirm q<CR>")
 vim.keymap.set("n", "<F10>", ":confirm q<CR>")
+
+-- Shift+Arrows to select text (VSCode-like)
+vim.keymap.set("i", "<S-Left>", "<Esc>v<Left>")
+vim.keymap.set("i", "<S-Right>", "<Esc>v<Right>")
+vim.keymap.set("i", "<S-Up>", "<Esc>v<Up>")
+vim.keymap.set("i", "<S-Down>", "<Esc>v<Down>")
+vim.keymap.set("v", "<S-Left>", "<Left>")
+vim.keymap.set("v", "<S-Right>", "<Right>")
+vim.keymap.set("v", "<S-Up>", "<Up>")
+vim.keymap.set("v", "<S-Down>", "<Down>")
 
 
 -- ========== THEME SWITCHER ==========
@@ -132,6 +145,14 @@ require('lualine').setup {
     component_separators = ''
   }
 }
+
+-- ========== COMMENTING (Ctrl+/) ==========
+require('Comment').setup()
+-- Map <C-/> and <C-_> to toggle comments
+vim.keymap.set("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)")
+vim.keymap.set("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)")
+vim.keymap.set("n", "<C-_>", "<Plug>(comment_toggle_linewise_current)")
+vim.keymap.set("v", "<C-_>", "<Plug>(comment_toggle_linewise_visual)")
 
 -- ========== AUTOCOMPLETION ==========
 local cmp = require'cmp'
