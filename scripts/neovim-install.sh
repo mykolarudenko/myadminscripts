@@ -100,6 +100,10 @@ vim.keymap.set("n", "<C-y>", "dd")
 -- Ctrl+Y (insert) — temporarily switch to normal, delete line, return to insert
 vim.keymap.set("i", "<C-y>", "<Esc>ddi")
 
+-- Ctrl+Z (normal/insert) — undo
+vim.keymap.set("n", "<C-z>", "u")
+vim.keymap.set("i", "<C-z>", "<C-o>u")
+
 -- Esc (insert) — does nothing (single Esc disabled to avoid accidental mode switches)
 vim.keymap.set("i", "<Esc>", "<Nop>")
 -- Double Esc (any mode) — prompt to save before exiting
