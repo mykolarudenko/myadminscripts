@@ -48,11 +48,11 @@ require("lazy").setup({
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   -- Syntax highlighting, Treesitter
   { "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdateSync",
     config = function()
       require'nvim-treesitter.configs'.setup {
         highlight = { enable = true },
         ensure_installed = { "lua", "python", "bash", "html", "css", "javascript", "json", "yaml", "markdown", "c", "cpp" },
-        auto_install = true,
       }
     end
   },
