@@ -80,18 +80,10 @@ vim.keymap.set("i", "<C-y>", "<Esc>ddi")
 
 -- Esc (insert) — does nothing (single Esc disabled to avoid accidental mode switches)
 vim.keymap.set("i", "<Esc>", "<Nop>")
--- Double Esc (insert) — exit insert mode (VSCode-like behavior)
-vim.keymap.set("i", "<Esc><Esc>", "<Esc>")
+-- Double Esc (any mode) — exit Neovim
+vim.keymap.set("i", "<Esc><Esc>", "<Esc>:q<CR>")
+vim.keymap.set("n", "<Esc><Esc>", ":q<CR>")
 
--- Ctrl+C (normal) — copy current line to system clipboard (can be pasted anywhere)
-vim.keymap.set("n", "<C-c>", '"+yy')
--- Ctrl+V (normal) — paste system clipboard below the cursor
-vim.keymap.set("n", "<C-v>", '"+p')
-
--- Ctrl+V (insert) — paste system clipboard at cursor position
-vim.keymap.set("i", "<C-v>", '<C-r>+')
--- Ctrl+C (insert) — copy current line to system clipboard (just like in normal mode)
-vim.keymap.set("i", "<C-c>", '<Esc>"+yygi')
 
 -- ========== STATUS LINE ==========
 require('lualine').setup {
@@ -127,14 +119,6 @@ cmp.setup({
 
 -- ========== EXTRAS ==========
 
--- Enable mouse support (for selecting, copying, and clicking)
-vim.o.mouse = "a"
-
--- Clipboard/selection help (for reference):
---  - Selection: press v (characterwise) or V (linewise), then move with arrows
---  - Copy selection to system clipboard: "+y
---  - Paste from system clipboard: Ctrl+V (or "+p in normal)
---  - Copy entire line to system clipboard: Ctrl+C (normal or insert)
 EOF
 
 echo "✅ Done! Start nvim and wait for plugins to install automatically."
