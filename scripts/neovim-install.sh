@@ -8,9 +8,21 @@ if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
     exit 1
 fi
 
-echo "🔧 Installing Neovim..."
-sudo apt update
-sudo apt install -y neovim git curl build-essential
+echo "🔧 Checking for Neovim and dependencies..."
+MISSING_PACKAGES=()
+for pkg in neovim git curl build-essential; do
+    if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "ok installed"; then
+        MISSING_PACKAGES+=("$pkg")
+    fi
+done
+
+if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
+    echo "🔧 The following packages are missing and will be installed: ${MISSING_PACKAGES[*]}"
+    sudo apt update
+    sudo apt install -y "${MISSING_PACKAGES[@]}"
+else
+    echo "✅ Neovim and all dependencies are already installed."
+fi
 
 echo "📂 Preparing config directories..."
 rm -rf ~/.config/nvim
