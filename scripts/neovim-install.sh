@@ -10,7 +10,7 @@ fi
 
 echo "🔧 Checking for Neovim and dependencies..."
 MISSING_PACKAGES=()
-for pkg in neovim git curl build-essential xclip; do
+for pkg in neovim git curl build-essential xclip ripgrep; do
     if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "ok installed"; then
         MISSING_PACKAGES+=("$pkg")
     fi
@@ -42,6 +42,8 @@ cat > ~/.config/nvim/init.lua <<'EOF'
 --   Neovim config VSCode-style
 -- ===========================
 
+vim.opt.termguicolors = true
+
 -- === Plugins with lazy.nvim ===
 require("lazy").setup({
   -- Bottom statusline
@@ -63,17 +65,17 @@ require("lazy").setup({
   "EdenEast/nightfox.nvim",
   "Mofiqul/vscode.nvim",
   "morhetz/gruvbox",
-  -- Autocompletion
-  "hrsh7th/nvim-cmp",
-  "hrsh7th/cmp-buffer",
-  "hrsh7th/cmp-path",
-  "hrsh7th/cmp-nvim-lsp",
-  "L3MON4D3/LuaSnip",
-  "saadparwaiz1/cmp_luasnip",
+
+  -- UI and helpers
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} }, -- Indentation guides
+  { "folke/which-key.nvim", event = "VeryLazy", opts = {} }, -- Keybinding popup
+  { 'nvim-telescope/telescope.nvim', tag = '0.1.x', -- Fuzzy finder
+    dependencies = { 'nvim-lua/plenary.nvim' }
+  },
 })
 
 -- === Default colorscheme ===
-vim.cmd.colorscheme("gruvbox")
+vim.cmd.colorscheme("vscode")
 -- Change with the :Themes command
 
 -- === Always start in insert mode ===
@@ -97,6 +99,22 @@ vim.o.clipboard = "unnamedplus"
 vim.keymap.set("n", "<C-s>", ":w<CR>")
 -- Ctrl+S (insert) — temporarily switch to normal, save, return to insert
 vim.keymap.set("i", "<C-s>", "<Esc>:w<CR>gi")
+
+-- F2 (any mode) — save file
+vim.keymap.set("n", "<F2>", ":w<CR>")
+vim.keymap.set("i", "<F2>", "<Esc>:w<CR>gi")
+
+-- F7 (any mode) — search
+vim.keymap.set("n", "<F7>", "/")
+vim.keymap.set("i", "<F7>", "<Esc>/")
+
+-- F8 (any mode) — next search result
+vim.keymap.set("n", "<F8>", "n")
+vim.keymap.set("i", "<F8>", "<Esc>n")
+
+-- Shift+F8 (any mode) — previous search result
+vim.keymap.set("n", "<S-F8>", "N")
+vim.keymap.set("i", "<S-F8>", "<Esc>N")
 
 -- Ctrl+Y (normal) — delete current line (VSCode-style)
 vim.keymap.set("n", "<C-y>", "dd")
@@ -137,6 +155,17 @@ vim.keymap.set("i", "<PageUp>", "<C-o><C-u>")
 vim.keymap.set("i", "<PageDown>", "<C-o><C-d>")
 
 
+-- ========== TELESCOPE (FUZZY FINDER) ==========
+-- See: https://github.com/nvim-telescope/telescope.nvim
+local builtin = require('telescope.builtin')
+-- Ctrl+P to find files
+vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = "Telescope: Find files" })
+-- Ctrl+G to search for a string in the project
+vim.keymap.set('n', '<C-g>', builtin.live_grep, { desc = "Telescope: Live grep" })
+-- Ctrl+B to search in open buffers
+vim.keymap.set('n', '<C-b>', builtin.buffers, { desc = "Telescope: Find in buffers" })
+
+
 -- ========== THEME SWITCHER ==========
 -- Define available themes
 local themes = {
@@ -170,29 +199,6 @@ vim.keymap.set("v", "<C-?>", "<Plug>(comment_toggle_linewise_visual)")
 -- Map <C-S-3> (Ctrl+Shift+# on many keyboards) as an alternative for SSH
 vim.keymap.set("n", "<C-S-3>", "<Plug>(comment_toggle_linewise_current)")
 vim.keymap.set("v", "<C-S-3>", "<Plug>(comment_toggle_linewise_visual)")
-
--- ========== AUTOCOMPLETION ==========
-local cmp = require'cmp'
-local luasnip = require'luasnip'
-cmp.setup({
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = {
-    ['<C-Space>'] = cmp.mapping.complete(),           -- manually trigger completion menu
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),-- Enter — accept current suggestion
-    ['<Tab>'] = cmp.mapping.select_next_item(),       -- Tab — next completion item
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(),     -- Shift+Tab — previous completion item
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'buffer' },
-    { name = 'path' },
-    { name = 'luasnip' },
-  }
-})
 
 -- ========== EXTRAS ==========
 
