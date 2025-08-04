@@ -162,11 +162,14 @@ require('lualine').setup {
   }
 }
 
--- ========== COMMENTING (Ctrl+Shift+/) ==========
+-- ========== COMMENTING (Ctrl+Shift+/ or Ctrl+Shift+#) ==========
 require('Comment').setup()
 -- Map <C-?> (which is Ctrl+Shift+/ on many keyboards) to toggle comments
 vim.keymap.set("n", "<C-?>", "<Plug>(comment_toggle_linewise_current)")
 vim.keymap.set("v", "<C-?>", "<Plug>(comment_toggle_linewise_visual)")
+-- Map <C-S-3> (Ctrl+Shift+# on many keyboards) as an alternative for SSH
+vim.keymap.set("n", "<C-S-3>", "<Plug>(comment_toggle_linewise_current)")
+vim.keymap.set("v", "<C-S-3>", "<Plug>(comment_toggle_linewise_visual)")
 
 -- ========== AUTOCOMPLETION ==========
 local cmp = require'cmp'
