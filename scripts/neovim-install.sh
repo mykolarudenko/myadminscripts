@@ -62,7 +62,7 @@ require("lazy").setup({
 
 -- === Default colorscheme ===
 vim.cmd.colorscheme("catppuccin-mocha")
--- Change with the :Themes command
+-- Change with the :themes command
 
 -- === Treesitter setup ===
 require'nvim-treesitter.configs'.setup {
@@ -110,8 +110,8 @@ local themes = {
   'catppuccin-latte', 'catppuccin-frappe', 'catppuccin-macchiato', 'catppuccin-mocha',
   'tokyonight', 'nightfox', 'vscode', 'gruvbox'
 }
--- Create the :Themes command for interactive selection
-vim.api.nvim_create_user_command('Themes', function()
+-- Create the :themes command for interactive selection
+vim.api.nvim_create_user_command('themes', function()
   vim.ui.select(themes, { prompt = 'Select a colorscheme:' }, function(choice)
     if choice then
       vim.cmd.colorscheme(choice)
@@ -157,5 +157,5 @@ cmp.setup({
 EOF
 
 echo "✅ Done! Start nvim and wait for plugins to install automatically."
-echo "🌈 You can change the colorscheme with the :Themes command."
+echo "🌈 You can change the colorscheme with the :themes command."
 echo "🖱️  Mouse is enabled: you can select, copy, and click."
