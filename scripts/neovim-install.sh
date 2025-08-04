@@ -47,7 +47,7 @@ require("lazy").setup({
   -- Bottom statusline
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   -- Syntax highlighting, Treesitter
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  { "nvim-treesitter/nvim-treesitter" },
   -- Color schemes
   "catppuccin/nvim",
   "folke/tokyonight.nvim",
