@@ -78,6 +78,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end
 })
 
+-- === Make Backspace work as expected ===
+vim.o.backspace = "indent,eol,start"
+
 -- ========== KEYBINDINGS WITH EXPLANATIONS ==========
 
 -- Ctrl+S (normal) — save file
