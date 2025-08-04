@@ -47,7 +47,15 @@ require("lazy").setup({
   -- Bottom statusline
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   -- Syntax highlighting, Treesitter
-  { "nvim-treesitter/nvim-treesitter" },
+  { "nvim-treesitter/nvim-treesitter",
+    config = function()
+      require'nvim-treesitter.configs'.setup {
+        highlight = { enable = true },
+        ensure_installed = { "lua", "python", "bash", "html", "css", "javascript", "json", "yaml", "markdown", "c", "cpp" },
+        auto_install = true,
+      }
+    end
+  },
   -- Color schemes
   "catppuccin/nvim",
   "folke/tokyonight.nvim",
@@ -66,13 +74,6 @@ require("lazy").setup({
 -- === Default colorscheme ===
 vim.cmd.colorscheme("catppuccin-mocha")
 -- Change with the :Themes command
-
--- === Treesitter setup ===
-require'nvim-treesitter.configs'.setup {
-  highlight = { enable = true },
-  ensure_installed = { "lua", "python", "bash", "html", "css", "javascript", "json", "yaml", "markdown", "c", "cpp" },
-  auto_install = true,
-}
 
 -- === Always start in insert mode ===
 vim.api.nvim_create_autocmd("VimEnter", {
