@@ -84,6 +84,10 @@ vim.keymap.set("i", "<Esc>", "<Nop>")
 vim.keymap.set("i", "<Esc><Esc>", "<Esc>:q<CR>")
 vim.keymap.set("n", "<Esc><Esc>", ":q<CR>")
 
+-- F10 (any mode) — exit Neovim
+vim.keymap.set("i", "<F10>", "<Esc>:q<CR>")
+vim.keymap.set("n", "<F10>", ":q<CR>")
+
 
 -- ========== STATUS LINE ==========
 require('lualine').setup {
