@@ -192,6 +192,9 @@ cmp.setup({
 
 EOF
 
-echo "✅ Done! Start nvim and wait for plugins to install automatically."
+echo "📦 Installing plugins and parsers... (this may take a minute)"
+nvim --headless "+Lazy! sync" +qa
+
+echo "✅ Done! You can now start nvim."
 echo "🌈 You can change the colorscheme with the :Themes command."
 echo "🖱️  Mouse is enabled: you can select, copy, and click."
