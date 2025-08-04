@@ -27,6 +27,8 @@ fi
 echo "📂 Preparing config directories..."
 rm -rf ~/.config/nvim
 rm -rf ~/.local/share/nvim
+rm -rf ~/.local/state/nvim
+rm -rf ~/.cache/nvim
 mkdir -p ~/.config/nvim/lua
 
 echo "📦 Installing lazy.nvim..."
