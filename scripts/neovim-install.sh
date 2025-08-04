@@ -104,6 +104,9 @@ vim.keymap.set("i", "<C-y>", "<Esc>ddi")
 vim.keymap.set("n", "<C-z>", "u")
 vim.keymap.set("i", "<C-z>", "<C-o>u")
 
+-- Ctrl+C (visual) — copy selection to system clipboard
+vim.keymap.set("v", "<C-c>", '"+y<Esc>')
+
 -- Esc (insert) — does nothing (single Esc disabled to avoid accidental mode switches)
 vim.keymap.set("i", "<Esc>", "<Nop>")
 -- Double Esc (any mode) — prompt to save before exiting
@@ -123,6 +126,12 @@ vim.keymap.set("v", "<S-Left>", "<Left>")
 vim.keymap.set("v", "<S-Right>", "<Right>")
 vim.keymap.set("v", "<S-Up>", "<Up>")
 vim.keymap.set("v", "<S-Down>", "<Down>")
+
+-- PageUp/PageDown for smoother half-page scrolling (VSCode-like)
+vim.keymap.set("n", "<PageUp>", "<C-u>")
+vim.keymap.set("n", "<PageDown>", "<C-d>")
+vim.keymap.set("i", "<PageUp>", "<C-o><C-u>")
+vim.keymap.set("i", "<PageDown>", "<C-o><C-d>")
 
 
 -- ========== THEME SWITCHER ==========
@@ -150,13 +159,11 @@ require('lualine').setup {
   }
 }
 
--- ========== COMMENTING (Ctrl+/) ==========
+-- ========== COMMENTING (Ctrl+Shift+/) ==========
 require('Comment').setup()
--- Map <C-/> and <C-_> to toggle comments
-vim.keymap.set("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)")
-vim.keymap.set("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)")
-vim.keymap.set("n", "<C-_>", "<Plug>(comment_toggle_linewise_current)")
-vim.keymap.set("v", "<C-_>", "<Plug>(comment_toggle_linewise_visual)")
+-- Map <C-?> (which is Ctrl+Shift+/ on many keyboards) to toggle comments
+vim.keymap.set("n", "<C-?>", "<Plug>(comment_toggle_linewise_current)")
+vim.keymap.set("v", "<C-?>", "<Plug>(comment_toggle_linewise_visual)")
 
 -- ========== AUTOCOMPLETION ==========
 local cmp = require'cmp'
