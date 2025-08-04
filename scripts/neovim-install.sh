@@ -92,13 +92,13 @@ vim.keymap.set("i", "<C-y>", "<Esc>ddi")
 
 -- Esc (insert) — does nothing (single Esc disabled to avoid accidental mode switches)
 vim.keymap.set("i", "<Esc>", "<Nop>")
--- Double Esc (any mode) — exit Neovim
-vim.keymap.set("i", "<Esc><Esc>", "<Esc>:q<CR>")
-vim.keymap.set("n", "<Esc><Esc>", ":q<CR>")
+-- Double Esc (any mode) — exit Neovim without saving
+vim.keymap.set("i", "<Esc><Esc>", "<Esc>:q!<CR>")
+vim.keymap.set("n", "<Esc><Esc>", ":q!<CR>")
 
--- F10 (any mode) — exit Neovim
-vim.keymap.set("i", "<F10>", "<Esc>:q<CR>")
-vim.keymap.set("n", "<F10>", ":q<CR>")
+-- F10 (any mode) — exit Neovim without saving
+vim.keymap.set("i", "<F10>", "<Esc>:q!<CR>")
+vim.keymap.set("n", "<F10>", ":q!<CR>")
 
 
 -- ========== STATUS LINE ==========
