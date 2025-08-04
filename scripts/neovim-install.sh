@@ -62,7 +62,7 @@ require("lazy").setup({
 
 -- === Default colorscheme ===
 vim.cmd.colorscheme("catppuccin-mocha")
--- Change with :colorscheme tokyonight / vscode / gruvbox / etc
+-- Change with the :Themes command
 
 -- === Treesitter setup ===
 require'nvim-treesitter.configs'.setup {
@@ -104,6 +104,22 @@ vim.keymap.set("i", "<F10>", "<Esc>:confirm q<CR>")
 vim.keymap.set("n", "<F10>", ":confirm q<CR>")
 
 
+-- ========== THEME SWITCHER ==========
+-- Define available themes
+local themes = {
+  'catppuccin-latte', 'catppuccin-frappe', 'catppuccin-macchiato', 'catppuccin-mocha',
+  'tokyonight', 'nightfox', 'vscode', 'gruvbox'
+}
+-- Create the :Themes command for interactive selection
+vim.api.nvim_create_user_command('Themes', function()
+  vim.ui.select(themes, { prompt = 'Select a colorscheme:' }, function(choice)
+    if choice then
+      vim.cmd.colorscheme(choice)
+    end
+  end)
+end, { desc = "Select a colorscheme from a list" })
+
+
 -- ========== STATUS LINE ==========
 require('lualine').setup {
   options = {
@@ -141,5 +157,5 @@ cmp.setup({
 EOF
 
 echo "✅ Done! Start nvim and wait for plugins to install automatically."
-echo "🌈 You can change colorscheme with :colorscheme <name>"
+echo "🌈 You can change the colorscheme with the :Themes command."
 echo "🖱️  Mouse is enabled: you can select, copy, and click."
