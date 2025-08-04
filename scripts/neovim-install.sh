@@ -10,7 +10,7 @@ fi
 
 echo "🔧 Checking for Neovim and dependencies..."
 MISSING_PACKAGES=()
-for pkg in neovim git curl build-essential; do
+for pkg in neovim git curl build-essential xclip; do
     if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "ok installed"; then
         MISSING_PACKAGES+=("$pkg")
     fi
@@ -87,6 +87,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
 vim.o.backspace = "indent,eol,start"
 -- Keep indentation on new lines and when pasting
 vim.o.autoindent = true
+
+-- === Use system clipboard for yank/paste ===
+vim.o.clipboard = "unnamedplus"
 
 -- ========== KEYBINDINGS WITH EXPLANATIONS ==========
 
