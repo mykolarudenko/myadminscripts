@@ -49,3 +49,28 @@ This script installs and configures Neovim as a lightweight yet powerful console
 | `Ctrl+G` | Search text in all project files (Live Grep) |
 | `Ctrl+B` | Search in open buffers |
 | `Ctrl`+`Shift`+`/` | Comment/uncomment line/block |
+
+---
+## `scripts/install-gh.sh`
+
+This script automates the installation of the [GitHub CLI](https://cli.github.com/) (`gh`) on Debian/Ubuntu systems. It is a prerequisite for using scripts that rely on browser-based GitHub authentication, such as `publish-to-github.sh`.
+
+### What it does
+
+1.  Checks if `gh` is already installed.
+2.  If not, it adds the official GitHub CLI repository to `apt`.
+3.  Installs the `gh` package.
+4.  After installation, you need to run `gh auth login` once to authenticate.
+
+---
+## `publish-to-github.sh`
+
+This script pushes your committed changes to the `main` branch of the remote repository on GitHub.
+
+It simplifies the publishing process by using the GitHub CLI for authentication, which means you don't need to manually manage SSH keys or tokens.
+
+### What it does
+
+1.  Verifies that the GitHub CLI (`gh`) is installed.
+2.  Checks if you are authenticated with GitHub.
+3.  If both checks pass, it executes `git push origin main`.
