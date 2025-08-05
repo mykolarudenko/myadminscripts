@@ -62,3 +62,43 @@ This script automates the installation of the [GitHub CLI](https://cli.github.co
 3.  Installs the `gh` package.
 4.  After installation, you need to run `gh auth login` once to authenticate.
 
+---
+## `scripts/xfce-setup.sh`
+
+This script automates the setup and customization of an XFCE desktop environment on a Debian/Ubuntu based system. It aims to create a modern, functional, and visually appealing workspace with a focus on productivity.
+
+### What it does
+
+1.  **Installs XFCE:** Sets up the core XFCE desktop environment without recommended packages for a minimal installation.
+2.  **Applies Dark Theme:** Installs and configures the `Yaru-dark` theme for GTK applications, window manager, and icons.
+3.  **Configures the Panel:** Removes default panels and creates a single, modern-looking panel at the bottom of the screen. The panel includes:
+    -   Whisker Menu for application launching.
+    -   A tasklist with flat buttons.
+    -   CPU graph and temperature sensors.
+    -   System tray, notifications, and a 24-hour LCD-style clock.
+4.  **Installs Essential Tools:**
+    -   `ulauncher` for quick application and file searching, configured with a dark theme and bound to the `Super` key.
+    -   Additional panel plugins like `xfce4-cpugraph-plugin` and `xfce4-whiskermenu-plugin`.
+5.  **Customizes Appearance:**
+    -   Downloads and sets custom wallpapers for the desktop and the XFCE terminal.
+    -   Disables desktop icons for a cleaner look.
+    -   Installs `Inter` and `Iosevka` fonts.
+    -   Sets `Inter` as the default UI font and `Iosevka` as the monospace font.
+    -   Disables UI animations and enables font anti-aliasing for a smoother experience.
+    -   Hides window titles for maximized windows to save screen space.
+
+### Usage
+To run the script, make it executable and execute it:
+```bash
+chmod +x scripts/xfce-setup.sh
+./scripts/xfce-setup.sh
+```
+A logout/login may be required for all changes to take effect.
+
+![XFCE Desktop Screenshot 1](screenshots/xfce01.png)
+![XFCE Desktop Screenshot 2](screenshots/xfce02.png)
+
+### Use on a remote server
+
+This script is ideal for setting up a graphical environment on a remote server, which can be accessed via tools like VNC (e.g., `tigervnc-standalone-server`) or Chrome Remote Desktop. After running the script, configure your remote desktop service to launch an XFCE session.
+

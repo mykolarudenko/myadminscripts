@@ -1,4 +1,9 @@
 #!/bin/bash
+# Copyright (c) 2024 Mykola Rudenko
+# This script is licensed under the MIT License.
+# See the LICENSE file for details.
+# https://github.com/mykolarudenko/myadminscripts
+#
 # This script sets up a customized XFCE desktop environment for the current user.
 # It installs necessary packages, fonts, and applications, then applies a
 # pre-defined configuration from the 'scripts/xfce-config' directory using a manifest.

@@ -1,4 +1,8 @@
 #!/bin/bash
+# Copyright (c) 2024 Mykola Rudenko
+# This script is licensed under the MIT License.
+# See the LICENSE file for details.
+# https://github.com/mykolarudenko/myadminscripts
 #
 # prepare-xfce-configs.sh
 #
