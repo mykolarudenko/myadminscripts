@@ -13,9 +13,9 @@ is_installed() {
 install_packages() {
     local packages_to_install=()
     local required_packages=(
-        "xfce4" "yaru-theme-gtk" "yaru-theme-icon" "xfce4-cpugraph-plugin"
-        "xfce4-whiskermenu-plugin" "ulauncher" "wget" "unzip" "jq"
-        "xfce4-sensors-plugin" "lm-sensors"
+        "xfce4" "xfce4-session" "yaru-theme-gtk" "yaru-theme-icon" "xfce4-cpugraph-plugin"
+        "xfce4-whiskermenu-plugin" "wget" "unzip" "jq" "curl"
+        "xfce4-sensors-plugin" "lm-sensors" "xfce4-terminal" "xfce4-notifyd"
     )
 
     echo "🔧 Checking for required packages..."
@@ -36,27 +36,100 @@ install_packages() {
 
 # --- Configuration Functions ---
 
-install_fonts() {
-    echo "📦 Installing Iosevka fonts..."
-    local font_dir="$HOME/.local/share/fonts"
-    local font_zip_url="https://github.com/be5invis/Iosevka/releases/download/v33.2.7/PkgTTC-Iosevka-33.2.7.zip"
-    local tmp_zip="/tmp/iosevka.zip"
-    local font_install_dir="$font_dir/Iosevka-33.2.7"
 
-    if [ -d "$font_install_dir" ]; then
+clear_old_config() {
+    echo "🧹 Clearing old XFCE configuration for a clean slate..."
+    local config_dir="$HOME/.config/xfce4"
+    if [ -d "$config_dir" ]; then
+        read -p "🚨 WARNING: This will permanently delete your existing XFCE configuration at $config_dir. Are you sure? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "🛑 Aborting setup as requested."
+            exit 1
+        fi
+        echo "🛑 Stopping running XFCE panel to prevent errors..."
+        pkill xfce4-panel || true
+        sleep 1 # Give it a moment to terminate
+
+        echo "Removing old configuration directory: $config_dir"
+        rm -rf "$config_dir"
+        echo "✅ Old XFCE configuration removed."
+    else
+        echo "✅ No old XFCE configuration found."
+    fi
+}
+
+install_fonts() {
+    echo "📦 Installing required fonts..."
+    local font_dir="$HOME/.local/share/fonts"
+    mkdir -p "$font_dir"
+    local cache_needs_rebuild=false
+
+    # --- Install Iosevka ---
+    local iosevka_install_dir="$font_dir/Iosevka-33.2.7"
+    if [ -d "$iosevka_install_dir" ]; then
         echo "✅ Iosevka fonts seem to be already installed."
+    else
+        echo "-> Downloading and installing Iosevka..."
+        local iosevka_zip_url="https://github.com/be5invis/Iosevka/releases/download/v33.2.7/PkgTTC-Iosevka-33.2.7.zip"
+        local iosevka_tmp_zip="/tmp/iosevka.zip"
+        wget -q --show-progress -O "$iosevka_tmp_zip" "$iosevka_zip_url"
+        unzip -oq "$iosevka_tmp_zip" -d "$iosevka_install_dir"
+        rm "$iosevka_tmp_zip"
+        cache_needs_rebuild=true
+        echo "✅ Iosevka fonts installed."
+    fi
+
+    # --- Install Inter ---
+    local inter_install_dir="$font_dir/Inter"
+    if [ -d "$inter_install_dir" ]; then
+        echo "✅ Inter font seems to be already installed."
+    else
+        echo "-> Downloading and installing Inter..."
+        local inter_zip_url="https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip"
+        local inter_tmp_zip="/tmp/inter.zip"
+        mkdir -p "$inter_install_dir"
+        wget -q --show-progress -O "$inter_tmp_zip" "$inter_zip_url"
+        unzip -oq "$inter_tmp_zip" -d "$inter_install_dir"
+        rm "$inter_tmp_zip"
+        cache_needs_rebuild=true
+        echo "✅ Inter font installed."
+    fi
+
+    if [ "$cache_needs_rebuild" = true ]; then
+        echo "🔄 Rebuilding font cache..."
+        fc-cache -f -v
+    fi
+}
+
+install_ulauncher() {
+    echo "📦 Installing ulauncher from .deb package..."
+    if command -v ulauncher &> /dev/null; then
+        echo "✅ ulauncher is already installed."
         return
     fi
 
-    mkdir -p "$font_dir"
-    echo "Downloading fonts..."
-    wget -q --show-progress -O "$tmp_zip" "$font_zip_url"
-    unzip -o "$tmp_zip" -d "$font_install_dir"
-    rm "$tmp_zip"
+    echo "-> Finding latest ulauncher release..."
+    local latest
+    latest=$(curl -sL https://api.github.com/repos/Ulauncher/Ulauncher/releases/latest | grep "tag_name" | cut -d '"' -f 4)
+    if [ -z "$latest" ]; then
+        echo "❌ Could not determine latest ulauncher version. Aborting ulauncher install."
+        return
+    fi
 
-    echo "🔄 Rebuilding font cache..."
-    fc-cache -f -v
-    echo "✅ Fonts installed."
+    # The tag from GitHub has a 'v' prefix (e.g., v5.15.0), but the .deb filename does not (e.g., ulauncher_5.15.0_all.deb).
+    local version_num=${latest#v}
+    local deb_file="/tmp/ulauncher.deb"
+    local deb_url="https://github.com/Ulauncher/Ulauncher/releases/download/${latest}/ulauncher_${version_num}_all.deb"
+
+    echo "-> Downloading ulauncher version ${version_num}..."
+    wget -q --show-progress -O "$deb_file" "$deb_url"
+
+    echo "-> Installing .deb package..."
+    sudo apt install -y "$deb_file"
+    rm "$deb_file"
+
+    echo "✅ ulauncher installed from .deb package."
 }
 
 configure_wallpapers() {
@@ -74,70 +147,33 @@ configure_wallpapers() {
     echo "Downloading wallpaper 2..."
     wget -q --show-progress -O "$wallpaper2_path" "$wallpaper2_url"
 
-    # Set desktop wallpaper
-    local desktop_props
-    desktop_props=$(xfconf-query -c xfce4-desktop -l | grep 'last-image$')
-    for prop in $desktop_props; do
-        xfconf-query -c xfce4-desktop -p "$prop" -s "$wallpaper1_path"
-    done
-    echo "✅ Desktop wallpaper set."
+    echo "✅ Wallpapers downloaded."
+}
 
-    # Set terminal wallpaper
-    local terminal_rc="$HOME/.config/xfce4/terminal/terminalrc"
-    if [ -f "$terminal_rc" ]; then
-        if grep -q "^BackgroundImage=" "$terminal_rc"; then
-            sed -i "s|^BackgroundImage=.*|BackgroundImage=TRUE|" "$terminal_rc"
-        else
-            echo "BackgroundImage=TRUE" >> "$terminal_rc"
-        fi
+apply_config_from_templates() {
+    echo "⚙️  Applying XFCE configuration from templates..."
+    local script_dir
+    script_dir=$(dirname "${BASH_SOURCE[0]}")
+    local template_dir="$script_dir/xfce-config"
+    local config_dir="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
 
-        escaped_path=$(printf '%s\n' "$wallpaper1_path" | sed 's:[&/\]:\\&:g')
-        if grep -q "^BackgroundImageFile=" "$terminal_rc"; then
-            sed -i "s|^BackgroundImageFile=.*|BackgroundImageFile=$escaped_path|" "$terminal_rc"
-        else
-            echo "BackgroundImageFile=$wallpaper1_path" >> "$terminal_rc"
-        fi
-        echo "✅ Terminal wallpaper set."
-    else
-        echo "⚠️  xfce4-terminal config not found. Skipping terminal wallpaper."
+    if [ ! -d "$template_dir" ]; then
+        echo "❌ ERROR: Template directory not found at $template_dir" >&2
+        exit 1
     fi
-}
-
-configure_theme_and_look() {
-    echo "🎨 Applying Yaru-dark theme and visual settings..."
-    # Set theme for GTK apps, window manager, and icons
-    xfconf-query -c xsettings -p /Net/ThemeName -s "Yaru-dark"
-    xfconf-query -c xfwm4 -p /general/theme -s "Yaru-dark"
-    xfconf-query -c xsettings -p /Net/IconThemeName -s "Yaru-dark"
-
-    # Disable menu/UI animations
-    xfconf-query -c xsettings -p /Gtk/EnableAnimations -s false
-
-    # Enable font anti-aliasing
-    xfconf-query -c xsettings -p /Xft/Antialias -s 1
-    xfconf-query -c xsettings -p /Xft/Hinting -s 1
-    xfconf-query -c xsettings -p /Xft/HintStyle -s "hintslight"
-    xfconf-query -c xsettings -p /Xft/RGBA -s "rgb"
     
-    echo "✅ Theme and look configured."
-}
+    mkdir -p "$config_dir"
 
-configure_desktop_and_wm() {
-    echo "🖥️  Configuring desktop and window manager..."
-    # Disable all desktop icons
-    xfconf-query -c xfce4-desktop -p /desktop-icons/style -s 0
-    
-    # Hide window title on maximized windows
-    xfconf-query -c xfwm4 -p /general/titleless_maximized -s true
+    for template_file in "$template_dir"/*.xml; do
+        if [ -f "$template_file" ]; then
+            filename=$(basename "$template_file")
+            echo "-> Applying $filename..."
+            # Replace hardcoded user path with the current user's HOME and copy to target.
+            sed "s|/home/mykola|$HOME|g" "$template_file" > "$config_dir/$filename"
+        fi
+    done
 
-    echo "✅ Desktop and WM configured."
-}
-
-configure_shortcuts() {
-    echo "⌨️  Configuring keyboard shortcuts..."
-    # Set Super key to open ulauncher.
-    xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -n -t string -s "ulauncher-toggle"
-    echo "✅ Keyboard shortcuts configured."
+    echo "✅ XFCE configuration files applied."
 }
 
 configure_ulauncher() {
@@ -159,95 +195,23 @@ configure_ulauncher() {
     echo "✅ ulauncher theme set to dark."
 }
 
-configure_panel() {
-    echo "📊 Configuring XFCE panel..."
-
-    # Kill running panel to apply changes cleanly
-    pkill xfce4-panel || true
-    sleep 1
-
-    # Clear existing panel configuration
-    xfconf-query -c xfce4-panel -p /panels -r -R
-    xfconf-query -c xfce4-panel -p /plugins -r -R
-    sleep 1
-
-    # Create a new panel (panel 1)
-    xfconf-query -c xfce4-panel -p /panels -n -t int -s 1 -a
-
-    # Configure the panel
-    xfconf-query -c xfce4-panel -p /panels/panel-1/position -n -t string -s "p=2;x=0;y=0" # p=2 is bottom
-    xfconf-query -c xfce4-panel -p /panels/panel-1/position-locked -n -t bool -s true
-    xfconf-query -c xfce4-panel -p /panels/panel-1/size -n -t int -s 32
-    xfconf-query -c xfce4-panel -p /panels/panel-1/length-adjust -n -t bool -s true # Full width
-    xfconf-query -c xfce4-panel -p /panels/panel-1/autohide-behavior -n -t int -s 0 # Never autohide
-
-    # Define plugins and their IDs
-    plugin_ids=(1 2 3 4 5 6 7 8 9 10)
-    plugin_names=(
-        "whiskermenu" "tasklist" "separator" "cpugraph" "sensors"
-        "separator" "systray" "notification-plugin" "clock" "actions"
-    )
-
-    # Add plugins to panel
-    prop_str=""
-    for id in "${plugin_ids[@]}"; do
-        prop_str+=" -t int -s $id"
-    done
-    xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -n -a $prop_str
-
-    # Configure each plugin type
-    for i in "${!plugin_ids[@]}"; do
-        id=${plugin_ids[$i]}
-        name=${plugin_names[$i]}
-        xfconf-query -c xfce4-panel -p "/plugins/plugin-$id" -n -t string -s "$name"
-    done
-
-    # --- Plugin-specific settings ---
-    # 2: Tasklist (Window Buttons)
-    xfconf-query -c xfce4-panel -p /plugins/plugin-2/flat-buttons -n -t bool -s true
-    
-    # 3: Separator (Expanding Spacer)
-    xfconf-query -c xfce4-panel -p /plugins/plugin-3/expand -n -t bool -s true
-    xfconf-query -c xfce4-panel -p /plugins/plugin-3/style -n -t int -s 0 # Transparent
-
-    # 4: CPU Graph
-    xfconf-query -c xfce4-panel -p /plugins/plugin-4/width -n -t int -s 160
-    xfconf-query -c xfce4-panel -p /plugins/plugin-4/display-style -n -t int -s 1 # LCD
-
-    # 6: Separator (non-expanding)
-    xfconf-query -c xfce4-panel -p /plugins/plugin-6/style -n -t int -s 0 # Transparent
-
-    # 7: System Tray
-    xfconf-query -c xfce4-panel -p /plugins/plugin-7/show-frame -n -t bool -s false
-    
-    # 9: Clock
-    xfconf-query -c xfce4-panel -p /plugins/plugin-9/digital-format -n -t string -s "%H:%M" # 24h
-    xfconf-query -c xfce4-panel -p /plugins/plugin-9/digital-layout -n -t int -s 3 # LCD
-    xfconf-query -c xfce4-panel -p /plugins/plugin-9/digital-flash -n -t bool -s true # Blinking dots
-
-    echo "✅ Panel configured."
-}
 
 # --- Main Execution ---
 
 main() {
     echo "🚀 Starting XFCE setup..."
     
+    clear_old_config
     install_packages
+    install_ulauncher
     install_fonts
     configure_wallpapers
-    configure_theme_and_look
-    configure_desktop_and_wm
-    configure_shortcuts
-    configure_panel
+    apply_config_from_templates
     configure_ulauncher
 
-    echo "🔄 Launching new panel configuration..."
-    (xfce4-panel &)
-    disown
-
     echo "✅✅✅ XFCE setup complete! ✅✅✅"
-    echo "💡 Some changes may require a logout/login to take full effect."
+    echo "💡 All settings have been written to configuration files."
+    echo "💡 Please logout and log back in to your XFCE session for all changes to take effect."
     echo "💡 For temperature monitoring, you may need to run 'sudo sensors-detect' and follow the prompts."
 }
 
