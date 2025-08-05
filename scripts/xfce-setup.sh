@@ -133,6 +133,13 @@ configure_desktop_and_wm() {
     echo "✅ Desktop and WM configured."
 }
 
+configure_shortcuts() {
+    echo "⌨️  Configuring keyboard shortcuts..."
+    # Set Super key to open ulauncher.
+    xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -n -t string -s "ulauncher-toggle"
+    echo "✅ Keyboard shortcuts configured."
+}
+
 configure_ulauncher() {
     echo "🚀 Configuring ulauncher..."
     local ulauncher_settings="$HOME/.config/ulauncher/settings.json"
@@ -231,6 +238,7 @@ main() {
     configure_wallpapers
     configure_theme_and_look
     configure_desktop_and_wm
+    configure_shortcuts
     configure_panel
     configure_ulauncher
 
