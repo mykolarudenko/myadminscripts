@@ -65,7 +65,7 @@ This script automates the installation of the [GitHub CLI](https://cli.github.co
 ---
 ## `scripts/xfce-setup.sh`
 
-This script automates the setup and customization of an XFCE desktop environment on a Debian/Ubuntu based system. It aims to create a modern, functional, and visually appealing workspace with a focus on productivity.
+This script automates the setup and customization of an XFCE desktop environment on a Debian/Ubuntu based system. It configures a specialized desktop environment, optimized to perform well on a remote machine and intended primarily for remote administration or development.
 
 ### What it does
 
