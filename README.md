@@ -13,39 +13,39 @@ These scripts were not designed for public use or distribution. I originally wro
 ---
 ## `scripts/neovim-install.sh`
 
-Этот скрипт устанавливает и настраивает Neovim как легковесный, но мощный консольный редактор, стилизованный под VSCode. Он предназначен для быстрой замены стандартных `nano` или `mcedit` на серверах.
+This script installs and configures Neovim as a lightweight yet powerful console editor, styled after VSCode. It is intended for quickly replacing standard editors like `nano` or `mcedit` on servers.
 
 ![Neovim in action](screenshots/neovim-install.png)
 
-### Что он делает?
+### What it does
 
-1.  **Проверяет и устанавливает зависимости:** `neovim`, `git`, `curl`, `build-essential`, `xclip`, `ripgrep`.
-2.  **Полностью очищает старые конфигурации** Neovim для чистой установки.
-3.  **Устанавливает менеджер плагинов** `lazy.nvim`.
-4.  **Создает конфигурационный файл** `init.lua` с плагинами и настройками для VSCode-подобного опыта.
-5.  **Автоматически устанавливает все плагины** при первом запуске.
+1.  **Checks and installs dependencies:** `neovim`, `git`, `curl`, `build-essential`, `xclip`, `ripgrep`.
+2.  **Completely clears old Neovim configurations** for a clean installation.
+3.  **Installs the plugin manager** `lazy.nvim`.
+4.  **Creates a configuration file** `init.lua` with plugins and settings for a VSCode-like experience.
+5.  **Automatically installs all plugins** on the first run.
 
-### Особенности
+### Features
 
--   **VSCode-подобный интерфейс:** Тема по умолчанию `vscode`, привычные горячие клавиши.
--   **Подсветка синтаксиса:** Для множества языков с помощью `nvim-treesitter`.
--   **Нечеткий поиск:** `Telescope` для быстрого поиска файлов (`Ctrl+P`), текста в проекте (`Ctrl+G`) и открытых буферов (`Ctrl+B`).
--   **Удобное комментирование:** (`Ctrl`+`Shift`+`/`).
--   **Интерактивный выбор темы:** Команда `:Themes` для смены цветовой схемы.
--   **Работа с системным буфером обмена.**
+-   **VSCode-like interface:** Default theme is `vscode`, familiar hotkeys.
+-   **Syntax highlighting:** For multiple languages using `nvim-treesitter`.
+-   **Fuzzy search:** `Telescope` for quick file search (`Ctrl+P`), project-wide text search (`Ctrl+G`), and open buffer search (`Ctrl+B`).
+-   **Easy commenting:** (`Ctrl`+`Shift`+`/`).
+-   **Interactive theme selection:** `:Themes` command to change the color scheme.
+-   **System clipboard integration.**
 
-### Основные горячие клавиши
+### Main Hotkeys
 
-| Клавиша(и) | Действие |
+| Key(s) | Action |
 | --- | --- |
-| `Ctrl+S` / `F2` | Сохранить файл |
-| `Esc` `Esc` / `F10` | Выйти из редактора (с подтверждением сохранения) |
-| `Ctrl+C` (в режиме выделения) | Копировать в системный буфер обмена |
-| `Ctrl+Y` | Удалить текущую строку |
-| `Ctrl+Z` | Отменить последнее действие |
-| `F7` | Начать поиск по файлу |
-| `F8` / `Shift+F8` | Следующий/предыдущий результат поиска |
-| `Ctrl+P` | Поиск файлов в проекте (Fuzzy Find) |
-| `Ctrl+G` | Поиск текста во всех файлах проекта (Live Grep) |
-| `Ctrl+B` | Поиск по открытым буферам |
-| `Ctrl`+`Shift`+`/` | Закомментировать/раскомментировать строку/блок |
+| `Ctrl+S` / `F2` | Save file |
+| `Esc` `Esc` / `F10` | Exit editor (with save confirmation) |
+| `Ctrl+C` (in visual mode) | Copy to system clipboard |
+| `Ctrl+Y` | Delete current line |
+| `Ctrl+Z` | Undo last action |
+| `F7` | Start search in file |
+| `F8` / `Shift+F8` | Next/previous search result |
+| `Ctrl+P` | Find files in project (Fuzzy Find) |
+| `Ctrl+G` | Search text in all project files (Live Grep) |
+| `Ctrl+B` | Search in open buffers |
+| `Ctrl`+`Shift`+`/` | Comment/uncomment line/block |
