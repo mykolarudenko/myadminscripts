@@ -1,5 +1,9 @@
 #!/bin/bash
-# This script sets up a customized XFCE desktop environment.
+# This script sets up a customized XFCE desktop environment for the current user.
+# It installs necessary packages, fonts, and applications, then applies a
+# pre-defined configuration from the 'scripts/xfce-config' directory using a manifest.
+#
+# WARNING: This script will OVERWRITE existing XFCE configurations in ~/.config/xfce4.
 set -e
 
 # --- Utility Functions ---
@@ -151,48 +155,47 @@ configure_wallpapers() {
 }
 
 apply_config_from_templates() {
-    echo "⚙️  Applying XFCE configuration from templates..."
+    echo "⚙️  Applying configuration from templates via cargo.list..."
     local script_dir
     script_dir=$(dirname "${BASH_SOURCE[0]}")
-    local template_dir="$script_dir/xfce-config"
-    local config_dir="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
+    local template_root="$script_dir/xfce-config"
+    local cargo_list="$template_root/cargo.list"
 
-    if [ ! -d "$template_dir" ]; then
-        echo "❌ ERROR: Template directory not found at $template_dir" >&2
+    if [ ! -f "$cargo_list" ]; then
+        echo "❌ ERROR: Manifest file not found at $cargo_list" >&2
         exit 1
     fi
-    
-    mkdir -p "$config_dir"
 
-    for template_file in "$template_dir"/*.xml; do
-        if [ -f "$template_file" ]; then
-            filename=$(basename "$template_file")
-            echo "-> Applying $filename..."
-            # Replace hardcoded user path with the current user's HOME and copy to target.
-            sed "s|/home/mykola|$HOME|g" "$template_file" > "$config_dir/$filename"
+    # Read the cargo.list file, ignoring comments and empty lines
+    grep -vE '^\s*#|^\s*$' "$cargo_list" | while IFS='=' read -r source_part dest_part; do
+        # Remove quotes from source and destination
+        local source_file
+        source_file=$(echo "$source_part" | tr -d '"')
+        local dest_file
+        dest_file=$(echo "$dest_part" | tr -d '"')
+
+        # Construct full source path
+        local source_path="$template_root/$source_file"
+        
+        # Replace placeholder in destination path with actual HOME
+        local final_dest_path
+        final_dest_path=${dest_file//\$\{user_home\}/$HOME}
+
+        if [ ! -f "$source_path" ]; then
+            echo "⚠️ WARNING: Source file not found, skipping: $source_path"
+            continue
         fi
+        
+        echo "-> Applying '$source_file' -> '$final_dest_path'"
+
+        # Create destination directory if it doesn't exist
+        mkdir -p "$(dirname "$final_dest_path")"
+        
+        # Copy file and replace placeholder in its content
+        sed "s|\${user_home}|$HOME|g" "$source_path" > "$final_dest_path"
     done
-
-    echo "✅ XFCE configuration files applied."
-}
-
-configure_ulauncher() {
-    echo "🚀 Configuring ulauncher..."
-    local ulauncher_settings="$HOME/.config/ulauncher/settings.json"
-    if ! command -v ulauncher &> /dev/null; then
-        echo "⚠️ ulauncher is not installed, skipping configuration."
-        return
-    fi
     
-    # Ensure ulauncher has created its config
-    if [ ! -f "$ulauncher_settings" ]; then
-        echo "⚠️ ulauncher settings not found. Please run ulauncher once to create its config file."
-        return
-    fi
-
-    # Use jq to set the theme
-    jq '."theme-name" = "Yaru-dark"' "$ulauncher_settings" > "${ulauncher_settings}.tmp" && mv "${ulauncher_settings}.tmp" "$ulauncher_settings"
-    echo "✅ ulauncher theme set to dark."
+    echo "✅ Configuration files applied."
 }
 
 
@@ -207,7 +210,6 @@ main() {
     install_fonts
     configure_wallpapers
     apply_config_from_templates
-    configure_ulauncher
 
     echo "✅✅✅ XFCE setup complete! ✅✅✅"
     echo "💡 All settings have been written to configuration files."
